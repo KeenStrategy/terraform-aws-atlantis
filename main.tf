@@ -399,6 +399,8 @@ module "efs_sg" {
   name        = "${var.name}-efs"
   vpc_id      = local.vpc_id
   description = "Security group allowing access to the EFS storage"
+  
+  revoke_rules_on_delete = true
 
   ingress_with_source_security_group_id = [{
     rule                     = "nfs-tcp",
@@ -774,6 +776,7 @@ resource "aws_ecs_task_definition" "atlantis" {
 
   lifecycle {
     ignore_changes = [
+      # TODO: nipper-2022-DEC-13 Figure out why container_definitions is triggering changes
       container_definitions,
     ]
   }
