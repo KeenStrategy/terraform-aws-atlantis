@@ -772,6 +772,12 @@ resource "aws_ecs_task_definition" "atlantis" {
     }
   }
 
+  lifecycle {
+    ignore_changes = [
+      container_definitions,
+    ]
+  }
+
   tags = local.tags
 }
 
