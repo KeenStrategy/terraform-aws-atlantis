@@ -399,8 +399,6 @@ module "efs_sg" {
   name        = "${var.name}-efs"
   vpc_id      = local.vpc_id
   description = "Security group allowing access to the EFS storage"
-  
-  revoke_rules_on_delete = true
 
   ingress_with_source_security_group_id = [{
     rule                     = "nfs-tcp",
