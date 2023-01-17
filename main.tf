@@ -466,6 +466,10 @@ resource "aws_efs_file_system" "this" {
   creation_token = coalesce(var.efs_file_system_token, var.name)
 
   encrypted = var.efs_file_system_encrypted
+
+  tags = {
+    Name = "efs-atlantis"
+  }
 }
 
 resource "aws_efs_mount_target" "this" {
