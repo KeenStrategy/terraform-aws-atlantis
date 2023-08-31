@@ -71,6 +71,18 @@ variable "azs" {
   default     = []
 }
 
+variable "enable_nat_gateway" {
+  description = "Should be true if you want to provision NAT Gateways for each of your private networks"
+  type        = bool
+  default     = true
+}
+
+variable "single_nat_gateway" {
+  description = "Should be true if you want to provision a single shared NAT Gateway across all of your private networks"
+  type        = bool
+  default     = true
+}
+
 variable "manage_default_security_group" {
   description = "Should be true to adopt and manage default security group"
   type        = bool
@@ -743,6 +755,18 @@ variable "efs_file_system_token" {
   default     = ""
 }
 
+variable "efs_throughput_mode" {
+  description = "(Optional) Throughput mode for the file system. Defaults to bursting. Valid values: bursting, provisioned, or elastic. When using provisioned, also set provisioned_throughput_in_mibps."
+  type        = string
+  default     = null
+}
+
+variable "efs_provisioned_throughput_in_mibps" {
+  description = "The throughput, measured in MiB/s, that you want to provision for the file system. Only applicable with efs_throughput_mode set to provisioned"
+  type        = number
+  default     = null
+}
+
 variable "alb_ip_address_type" {
   description = "The type of IP addresses used by the subnets for your load balancer. The possible values are ipv4 and dualstack"
   type        = string
@@ -764,5 +788,11 @@ variable "runtime_platform" {
 variable "max_session_duration" {
   description = "Maximum session duration (in seconds) for ecs task execution role. Default is 3600."
   type        = number
+  default     = null
+}
+
+variable "alb_enable_cross_zone_load_balancing" {
+  description = "Whether cross-zone load balancing is enabled for the load balancer"
+  type        = bool
   default     = null
 }
