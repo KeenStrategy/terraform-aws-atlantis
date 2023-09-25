@@ -1,8 +1,8 @@
 locals {
   # VPC - existing or new?
-  vpc_id             = var.vpc_id == "" ? module.vpc.vpc_id : var.vpc_id
-  private_subnet_ids = coalescelist(module.vpc.private_subnets, var.private_subnet_ids, [""])
-  public_subnet_ids  = coalescelist(module.vpc.public_subnets, var.public_subnet_ids, [""])
+  vpc_id             = var.vpc_id
+  private_subnet_ids = coalescelist(var.private_subnet_ids, [""])
+  public_subnet_ids  = coalescelist(var.public_subnet_ids, [""])
 
   # Atlantis
   atlantis_image = var.atlantis_image == "" ? "ghcr.io/runatlantis/atlantis:${var.atlantis_version}" : var.atlantis_image
@@ -200,34 +200,6 @@ resource "aws_ssm_parameter" "atlantis_github_app_key" {
   name  = var.atlantis_github_app_key_ssm_parameter_name
   type  = "SecureString"
   value = var.atlantis_github_app_key
-
-  tags = local.tags
-}
-
-################################################################################
-# VPC
-################################################################################
-
-module "vpc" {
-  source  = "terraform-aws-modules/vpc/aws"
-  version = "v3.6.0"
-
-  create_vpc = var.vpc_id == ""
-
-  name = var.name
-
-  cidr            = var.cidr
-  azs             = var.azs
-  private_subnets = var.private_subnets
-  public_subnets  = var.public_subnets
-
-  enable_nat_gateway   = var.enable_nat_gateway
-  single_nat_gateway   = var.single_nat_gateway
-  enable_dns_hostnames = !var.enable_ephemeral_storage
-
-  manage_default_security_group  = var.manage_default_security_group
-  default_security_group_ingress = var.default_security_group_ingress
-  default_security_group_egress  = var.default_security_group_egress
 
   tags = local.tags
 }
@@ -514,18 +486,27 @@ module "ecs" {
   source  = "terraform-aws-modules/ecs/aws"
   version = "v5.2.2"
 
-  create_ecs = var.create_ecs_cluster
+  create = var.create_ecs_cluster
 
-  name               = var.name
-  container_insights = var.ecs_container_insights
+  cluster_name = var.name
 
-  capacity_providers = ["FARGATE", "FARGATE_SPOT"]
+  cluster_settings = {
+    name  = "containerInsights"
+    value = var.ecs_container_insights ? "enabled" : "disabled"
+  }
 
-  default_capacity_provider_strategy = [
-    {
-      capacity_provider = var.ecs_fargate_spot ? "FARGATE_SPOT" : "FARGATE"
+  fargate_capacity_providers = {
+    FARGATE_SPOT = {
+      default_capacity_provider_strategy = {
+        weight = var.ecs_fargate_spot ? 100 : 0
+      }
     }
-  ]
+    FARGATE = {
+      default_capacity_provider_strategy = {
+        weight = var.ecs_fargate_spot ? 0 : 100
+      }
+    }
+  }
 
   tags = local.tags
 }
@@ -595,7 +576,7 @@ data "aws_iam_policy_document" "ecs_task_access_secrets" {
 data "aws_iam_policy_document" "ecs_task_access_secrets_with_kms" {
   count = var.ssm_kms_key_arn == "" ? 0 : 1
 
-  source_json = data.aws_iam_policy_document.ecs_task_access_secrets.json
+  source_policy_documents = [data.aws_iam_policy_document.ecs_task_access_secrets.json]
 
   statement {
     sid       = "AllowKMSDecrypt"
