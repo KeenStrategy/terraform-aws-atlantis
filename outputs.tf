@@ -58,7 +58,7 @@ output "ecs_cluster_id" {
 
 output "ecs_cluster_arn" {
   description = "ECS cluster ARN"
-  value       = module.ecs.ecs_cluster_arn
+  value       = module.ecs.cluster_arn
 }
 
 # VPC
@@ -116,9 +116,4 @@ output "alb_https_listeners_id" {
 output "alb_https_listeners_arn" {
   description = "ARN of alb https listeners"
   value       = module.alb.https_listener_arns
-}
-
-output "vpc_nat_public_ips" {
-  description = "List of public Elastic IPs created for AWS NAT Gateway"
-  value       = module.vpc.nat_public_ips
 }
