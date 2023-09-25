@@ -512,7 +512,7 @@ resource "aws_efs_access_point" "this" {
 ################################################################################
 module "ecs" {
   source  = "terraform-aws-modules/ecs/aws"
-  version = "v3.3.0"
+  version = "v5.2.2"
 
   create_ecs = var.create_ecs_cluster
 
