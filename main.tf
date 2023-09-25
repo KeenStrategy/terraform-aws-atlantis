@@ -87,7 +87,7 @@ locals {
       value = var.atlantis_write_git_creds
     }
   ]
-
+  
   # ECS task definition
   latest_task_definition_rev = var.external_task_definition_updates ? max(aws_ecs_task_definition.atlantis.revision, data.aws_ecs_task_definition.atlantis[0].revision) : aws_ecs_task_definition.atlantis.revision
 
@@ -498,12 +498,7 @@ module "ecs" {
   fargate_capacity_providers = {
     FARGATE_SPOT = {
       default_capacity_provider_strategy = {
-        weight = var.ecs_fargate_spot ? 100 : 0
-      }
-    }
-    FARGATE = {
-      default_capacity_provider_strategy = {
-        weight = var.ecs_fargate_spot ? 0 : 100
+        weight = 0
       }
     }
   }
