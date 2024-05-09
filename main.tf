@@ -31,7 +31,11 @@ locals {
   ecs_cluster_id = var.create_ecs_cluster ? module.ecs.cluster_id : var.ecs_cluster_id
 
   # Container definitions
-  container_definitions = var.custom_container_definitions == "" ? var.atlantis_bitbucket_user_token != "" ? jsonencode(concat([module.container_definition_bitbucket.json_map_object], var.extra_container_definitions)) : jsonencode(concat([module.container_definition_github_gitlab.json_map_object], var.extra_container_definitions)) : var.custom_container_definitions
+  container_definitions = (
+    var.custom_container_definitions == ""
+    ? jsonencode(concat([module.container_definition_github_gitlab.sensitive_json_map_object], var.extra_container_definitions))
+    : var.custom_container_definitions
+  )
 
   container_definition_environment = [
     {
@@ -652,62 +656,6 @@ module "container_definition_github_gitlab" {
   secrets = concat(
     local.container_definition_secrets_1,
     local.container_definition_secrets_2,
-    var.custom_environment_secrets,
-  )
-}
-
-module "container_definition_bitbucket" {
-  source  = "cloudposse/ecs-container-definition/aws"
-  version = "v0.58.1"
-
-  container_name  = var.name
-  container_image = local.atlantis_image
-
-  container_cpu                = var.container_cpu != null ? var.container_cpu : var.ecs_task_cpu
-  container_memory             = var.container_memory != null ? var.container_memory : var.ecs_task_memory
-  container_memory_reservation = var.container_memory_reservation
-
-  user                     = var.user
-  ulimits                  = var.ulimits
-  entrypoint               = var.entrypoint
-  command                  = var.command
-  working_directory        = var.working_directory
-  repository_credentials   = var.repository_credentials
-  docker_labels            = var.docker_labels
-  start_timeout            = var.start_timeout
-  stop_timeout             = var.stop_timeout
-  container_depends_on     = var.container_depends_on
-  essential                = var.essential
-  readonly_root_filesystem = var.readonly_root_filesystem
-  mount_points             = var.mount_points
-  volumes_from             = var.volumes_from
-
-  port_mappings = [
-    {
-      containerPort = var.atlantis_port
-      hostPort      = var.atlantis_port
-      protocol      = "tcp"
-    },
-  ]
-
-  log_configuration = {
-    logDriver = "awslogs"
-    options = {
-      awslogs-region        = data.aws_region.current.name
-      awslogs-group         = aws_cloudwatch_log_group.atlantis.name
-      awslogs-stream-prefix = "ecs"
-    }
-    secretOptions = []
-  }
-  firelens_configuration = var.firelens_configuration
-
-  environment = concat(
-    local.container_definition_environment,
-    var.custom_environment_variables,
-  )
-
-  secrets = concat(
-    local.container_definition_secrets_1,
     var.custom_environment_secrets,
   )
 }
