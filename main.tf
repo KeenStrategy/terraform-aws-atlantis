@@ -87,7 +87,7 @@ locals {
       value = var.atlantis_write_git_creds
     }
   ]
-  
+
   # ECS task definition
   latest_task_definition_rev = var.external_task_definition_updates ? max(aws_ecs_task_definition.atlantis.revision, data.aws_ecs_task_definition.atlantis[0].revision) : aws_ecs_task_definition.atlantis.revision
 
@@ -755,13 +755,6 @@ resource "aws_ecs_task_definition" "atlantis" {
         }
       }
     }
-  }
-
-  lifecycle {
-    ignore_changes = [
-      # TODO: nipper-2022-DEC-13 Figure out why container_definitions is triggering changes
-      container_definitions,
-    ]
   }
 
   tags = local.tags
