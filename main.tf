@@ -705,6 +705,13 @@ resource "aws_ecs_task_definition" "atlantis" {
     }
   }
 
+  lifecycle {
+    ignore_changes = [
+      # TODO: nipper-2022-DEC-13 Figure out why container_definitions is triggering changes
+      container_definitions,
+    ]
+  }
+
   tags = local.tags
 }
 
