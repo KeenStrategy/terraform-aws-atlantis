@@ -65,48 +65,6 @@ variable "cidr" {
   default     = ""
 }
 
-variable "azs" {
-  description = "A list of availability zones in the region"
-  type        = list(string)
-  default     = []
-}
-
-variable "enable_nat_gateway" {
-  description = "Should be true if you want to provision NAT Gateways for each of your private networks"
-  type        = bool
-  default     = true
-}
-
-variable "single_nat_gateway" {
-  description = "Should be true if you want to provision a single shared NAT Gateway across all of your private networks"
-  type        = bool
-  default     = true
-}
-
-variable "manage_default_security_group" {
-  description = "Should be true to adopt and manage default security group"
-  type        = bool
-  default     = false
-}
-
-variable "default_security_group_ingress" {
-  description = "List of maps of ingress rules to set on the default security group"
-  type        = list(map(string))
-  default     = []
-}
-
-variable "default_security_group_egress" {
-  description = "List of maps of egress rules to set on the default security group"
-  type        = list(map(string))
-  default     = []
-}
-
-variable "public_subnets" {
-  description = "A list of public subnets inside the VPC"
-  type        = list(string)
-  default     = []
-}
-
 variable "private_subnets" {
   description = "A list of private subnets inside the VPC"
   type        = list(string)
