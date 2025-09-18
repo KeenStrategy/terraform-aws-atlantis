@@ -488,22 +488,20 @@ resource "aws_efs_access_point" "this" {
 ################################################################################
 module "ecs" {
   source  = "terraform-aws-modules/ecs/aws"
-  version = "v5.2.2"
+  version = "v6.0.0"
 
   create = var.create_ecs_cluster
 
   cluster_name = var.name
 
-  cluster_settings = {
-    name  = "containerInsights"
-    value = var.ecs_container_insights ? "enabled" : "disabled"
-  }
+  # cluster_setting = {
+  #   name  = "containerInsights"
+  #   value = var.ecs_container_insights ? "enabled" : "disabled"
+  # }
 
-  fargate_capacity_providers = {
+  default_capacity_provider_strategy = {
     FARGATE_SPOT = {
-      default_capacity_provider_strategy = {
-        weight = 0
-      }
+      weight = 0
     }
   }
 
@@ -640,7 +638,7 @@ module "container_definition_github_gitlab" {
   log_configuration = {
     logDriver = "awslogs"
     options = {
-      awslogs-region        = data.aws_region.current.name
+      awslogs-region        = data.aws_region.current.region
       awslogs-group         = aws_cloudwatch_log_group.atlantis.name
       awslogs-stream-prefix = "ecs"
     }
