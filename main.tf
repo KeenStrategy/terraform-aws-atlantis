@@ -494,14 +494,16 @@ module "ecs" {
 
   cluster_name = var.name
 
-  # cluster_setting = {
-  #   name  = "containerInsights"
-  #   value = var.ecs_container_insights ? "enabled" : "disabled"
-  # }
+  cluster_setting = [
+    {
+      name  = "containerInsights"
+      value = var.ecs_container_insights
+    }
+  ]
 
   default_capacity_provider_strategy = {
     FARGATE_SPOT = {
-      weight = 0
+      weight = var.ecs_fargate_spot_cluster_weight
     }
   }
 
