@@ -323,11 +323,17 @@ variable "ecs_fargate_spot" {
   default     = false
 }
 
-# variable "ecs_container_insights" {
-#   description = "Controls if ECS Cluster has container insights enabled"
-#   type        = bool
-#   default     = false
-# }
+variable "ecs_container_insights" {
+  description = "Controls if ECS Cluster has container insights enabled or enhanced"
+  type        = string
+  default     = "enabled"
+}
+
+variable "ecs_fargate_spot_cluster_weight" {
+  description = "Weight for FARGATE_SPOT in the cluster default capacity provider strategy"
+  type        = number
+  default     = 0
+}
 
 variable "ecs_service_desired_count" {
   description = "The number of instances of the task definition to place and keep running"
