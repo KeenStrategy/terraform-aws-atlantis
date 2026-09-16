@@ -705,13 +705,6 @@ resource "aws_ecs_task_definition" "atlantis" {
     }
   }
 
-  lifecycle {
-    ignore_changes = [
-      # TODO: will no longer be needed once INF-1880 is completed
-      container_definitions,
-    ]
-  }
-
   tags = local.tags
 }
 
