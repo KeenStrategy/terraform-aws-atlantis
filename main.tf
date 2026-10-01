@@ -648,16 +648,22 @@ module "container_definition_github_gitlab" {
   }
   firelens_configuration = var.firelens_configuration
 
-  environment = concat(
-    local.container_definition_environment,
-    var.custom_environment_variables,
-  )
+  # Merge by name so a custom entry overrides a module default instead of
+  # duplicating it. ECS silently drops duplicate names on register, which
+  # makes container_definitions differ from state on every plan.
+  environment = [
+    for name, value in merge(
+      { for e in local.container_definition_environment : e.name => e.value },
+      { for e in var.custom_environment_variables : e.name => e.value },
+    ) : { name = name, value = value }
+  ]
 
-  secrets = concat(
-    local.container_definition_secrets_1,
-    local.container_definition_secrets_2,
-    var.custom_environment_secrets,
-  )
+  secrets = [
+    for name, value_from in merge(
+      { for s in concat(local.container_definition_secrets_1, local.container_definition_secrets_2) : s.name => s.valueFrom },
+      { for s in var.custom_environment_secrets : s.name => s.valueFrom },
+    ) : { name = name, valueFrom = value_from }
+  ]
 }
 
 resource "aws_ecs_task_definition" "atlantis" {

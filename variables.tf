@@ -633,7 +633,7 @@ variable "atlantis_bitbucket_base_url" {
 }
 
 variable "custom_environment_secrets" {
-  description = "List of additional secrets the container will use (list should contain maps with `name` and `valueFrom`)"
+  description = "List of additional secrets the container will use (list should contain maps with `name` and `valueFrom`). An entry whose `name` matches a module-defined secret overrides it"
   type = list(object(
     {
       name      = string
@@ -644,7 +644,7 @@ variable "custom_environment_secrets" {
 }
 
 variable "custom_environment_variables" {
-  description = "List of additional environment variables the container will use (list should contain maps with `name` and `value`)"
+  description = "List of additional environment variables the container will use (list should contain maps with `name` and `value`). An entry whose `name` matches a module-defined variable overrides it"
   type = list(object(
     {
       name  = string
